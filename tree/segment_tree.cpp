@@ -42,14 +42,14 @@ class segment_tree {
 		for(left += base_size(), right += base_size();
 			left < right;
 			left >>= 1, right >>= 1) {
-			if(left & 1)  l_value = bi_func(std::move(l_value), data[left++]);
-			if(right & 1) r_value = bi_func(data[--right], std::move(r_value)); 
+			if(left & 1)  l_value = bi_func(l_value, data[left++]);
+			if(right & 1) r_value = bi_func(data[--right], r_value); 
 		}
 		return bi_func(std::move(l_value), std::move(r_value));
 	}
 	void update(size_type index, const value_type& value) {
 		index += base_size();
-		data[index] = bi_func(std::move(data[index]), value);
+		data[index] = bi_func(data[index], value);
 
 		while(index >>= 1) meld(index);
 	}
