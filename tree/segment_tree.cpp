@@ -70,3 +70,6 @@ class segment_tree {
 		return data.empty();
 	}
 };
+
+// verify
+// +(RmQ) https://judge.yosupo.jp/submission/116
