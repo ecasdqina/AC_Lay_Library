@@ -1,6 +1,6 @@
-#define PROBLEM http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A
+#define PROBLEM "http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A"
 
-#include "../tree/union_find_tree.cpp"
+#include "AC_Lay_Library/tree/union_find_tree.cpp"
 
 int main() {
 	int n, q; scanf("%d%d", &n, &q);
