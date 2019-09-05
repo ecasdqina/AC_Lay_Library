@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-# you can install oj with: $ pip3 install --user -U online-judge-tools=='6.*'
-which oj > /dev/null
+which oj > /dev/null || { echo 'ERROR: please install `oj'\'' with: $ pip3 install --user -U online-judge-tools=='\''6.*'\''' >& 1 ; exit 1 ; }
 
 CXX=${CXX:-g++}
 CXXFLAGS="${CXXFLAGS:--std=c++14 -O2 -Wall -g}"
-ulimit -s 65532
+ulimit -s unlimited
+
 
 list-dependencies() {
     file="$1"
@@ -23,20 +23,10 @@ get-url() {
     list-defined "$file" | grep '^#define PROBLEM ' | sed 's/^#define PROBLEM "\(.*\)"$/\1/'
 }
 
-get-error() {
-    file="$1"
-    list-defined "$file" | grep '^#define ERROR ' | sed 's/^#define ERROR "\(.*\)"$/\1/'
-}
-
-get-last-commit-date() {
-    file="$1"
-    list-dependencies "$file" | git log -1 --date=iso --pretty=%ad
-}
-
 is-verified() {
     file="$1"
     cache=test/timestamp/$(echo -n "$file" | md5sum | sed 's/ .*//')
-    timestamp="$(get-last-commit-date "$file")"
+    timestamp="$(list-dependencies "$file" | xargs -I '{}' find "$file" '{}' -printf "%T+\t%p\n" | sort -nr | head -n 1 | cut -f 2)"
     [[ -e $cache ]] && [[ $timestamp -ot $cache ]]
 }
 
@@ -44,8 +34,7 @@ mark-verified() {
     file="$1"
     cache=test/timestamp/$(echo -n "$file" | md5sum | sed 's/ .*//')
     mkdir -p test/timestamp
-    timestamp="$(get-last-commit-date "$file")"
-    echo $timestamp > $cache
+    touch $cache
 }
 
 list-recently-updated() {
@@ -58,6 +47,8 @@ list-recently-updated() {
 
 run() {
     file="$1"
+    echo "$ ./test.sh $file"
+
     url="$(get-url "$file")"
     dir=test/$(echo -n "$url" | md5sum | sed 's/ .*//')
     mkdir -p ${dir}
@@ -72,52 +63,46 @@ run() {
         $CXX $CXXFLAGS -I . -o ${dir}/a.out "$file"
         if [[ -n ${url} ]] ; then
             # download
+            echo "$ oj d -a $url"
             if [[ ! -e ${dir}/test ]] ; then
                 sleep 2
                 oj download --system "$url" -d ${dir}/test
             fi
-            # test with tolerance error
-            if list-defined "$file" | grep '^#define ERROR ' > /dev/null ; then
-                error=$(get-error "$file")
-                oj test -e ${error} -c ${dir}/a.out -d ${dir}/test
-            else
-                oj test -c ${dir}/a.out -d ${dir}/test
-            fi
+            # test
+            echo '$ oj t'
+            oj test -c ${dir}/a.out -d ${dir}/test
         else
             # run
-            ${dir}/a.out
+            echo "$ ./a.out"
+            time ${dir}/a.out
         fi
         mark-verified "$file"
     fi
 }
 
 
-if [[ $# -eq 0 ]] ; then
+if [[ $# -eq 1 && ( $1 = -h || $1 = --help || $1 = -? ) ]] ; then
+    echo Usage: $0 '[FILE ...]'
+    echo 'Compile and Run specified C++ code.'
+    echo 'If the given code contains macro like `#define PROBLEM "https://..."'\'', Download test cases of the problem and Test with them.'
+    echo
+    echo 'Features:'
+    echo '-   glob files with "**/*.test.cpp" if no arguments given.'
+    echo '-   cache results of tests, analyze "#include <...>" relations, and execute tests if and only if necessary.'
+    echo '-   on CI environment (i.e. $CI is defined), only recently modified files are tested (without cache).'
+
+elif [[ $# -eq 0 ]] ; then
     if [[ $CI ]] ; then
         # CI
         for f in $(list-recently-updated) ; do
             run $f
         done
+
     else
-        # local / github actions
-        git config --global user.name "beet-aizu"
-        git config --global user.email "aki.bdash@gmail.com"
-
-        git remote set-url origin https://beet-aizu:${GITHUB_TOKEN}@github.com/beet-aizu/library.git
-
-        git checkout -b master
-        git branch -a
-
+        # local
         for f in $(find . -name \*.test.cpp) ; do
             run $f
         done
-
-        ls test/timestamp
-
-        last_commit="$(git log -1 | head -1)"
-        git add .
-        git commit -m "[auto-verifier] verify commit ${last_commit}"
-        git push origin HEAD
     fi
 else
     # specified
@@ -125,4 +110,3 @@ else
         run "$f"
     done
 fi
-
