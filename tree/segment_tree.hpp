@@ -4,8 +4,10 @@
 template<typename Monoid>
 class segment_tree {
 	using value_type = Monoid;
-	using binary_function = std::function<value_type(value_type, value_type)>;
 	using size_type = size_t;
+
+	using binary_function = std::function<value_type(value_type, value_type)>;
+	using checker = std::function<bool(value_type)>;
 	
 	const size_type size_;
 	size_type height_;
@@ -28,10 +30,10 @@ class segment_tree {
 	}
 	
 	public:
-	segment_tree(const size_type& size, const binary_function& bi_func, const value_type& id) :
-		size_(size),
-		bi_func(bi_func),
-		id(id) {
+	segment_tree(const size_type& size, const binary_function& bi_func, const value_type& id)
+		: size_(size),
+		  bi_func(bi_func),
+		  id(id) {
 		height_ = get_height(size);
 		data.assign(base_size() << 1, id);
 	}
@@ -59,10 +61,34 @@ class segment_tree {
 
 		while(index >>= 1) meld(index);
 	}
-	value_type operator[](const size_type& index) {
-		return data[index + base_size()];
+	const size_type search(const size_type & left, const checker & check) {
+		value_type val = id;
+		size_t base_size_ = base_size();
+		auto find = [&](auto&& find, size_type k, size_type l, size_type r) -> int {
+			if(l + 1 == r) {
+				val = bi_func(val, data[k]);
+				
+				return (check(val) ? k - base_size_ : -1);
+			}
+
+			const size_type mid = (l + r) >> 1;
+			if(mid <= left) return find(find, k << 1 ^ 1, mid, r);
+			if(left <= l and !check(bi_func(val, data[k]))) {
+				val = bi_func(val, data[k]);
+				return -1;
+			}
+
+			const int left_ret = find(find, k << 1 ^ 0, l, mid);
+			if(left_ret == -1) return find(find, k << 1 ^ 1, mid, r);
+			return left_ret;
+		};
+
+		return find(find, 1, 0, base_size_); 
 	}
 	
+	value_type operator[](const size_type& index) const {
+		return data[index + base_size()];
+	}
 	const size_type size() const {
 		return size_;
 	}
@@ -72,4 +98,7 @@ class segment_tree {
 };
 
 // verify
-// +(RmQ) https://judge.yosupo.jp/submission/116
+// + https://judge.yosupo.jp/submission/116
+//	 RmQ
+// + https://atcoder.jp/contests/abc130/submissions/7347630
+//	 search
