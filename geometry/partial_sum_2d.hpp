@@ -17,7 +17,7 @@ class partial_sum_2d {
 	void build() {
 		for(int i = 1; i < data.size(); i++)
 			for(int j = 1; j < data[i].size(); j++)
-				data[i][j] = data[i - 1][j] + data[i][j - 1] - data[i - 1][j - 1];
+				data[i][j] += data[i - 1][j] + data[i][j - 1] - data[i - 1][j - 1];
 	}
 	void add(const size_t && x, const size_t && y, const_value && z) {
 		data[x + 1][y + 1] += z;
@@ -25,5 +25,8 @@ class partial_sum_2d {
 	const_value query(const size_t && sx, const size_t && sy, const size_t && tx, const size_t && ty) const {
 		return data[tx][ty] - data[tx][sy] - data[sx][ty] + data[sx][sy];
 	}
+
+	const size_t height() { return data.size(); }
+	const size_t width() { return data[0].size(); };
 };
 
