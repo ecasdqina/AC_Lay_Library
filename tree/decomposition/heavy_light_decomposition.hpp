@@ -2,7 +2,7 @@
 #include <vector>
 #include <stack>
 #include <queue>
-#include "../segment_tree.hpp"
+#include <functional>
 
 // build: you have to run it before you use
 // for_each: process [l, r]
