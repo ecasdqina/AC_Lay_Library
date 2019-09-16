@@ -39,6 +39,12 @@ class lowest_common_ancestor {
 		g[v].push_back(u);
 	}
 	const size_t query(size_t u, size_t v) {
+		static bool built = false;
+		if(!built) {
+			build();
+			built = true;
+		}
+
 		if(depth[u] > depth[v]) std::swap(u, v);
 		for(int k = 0; k < logN; k++) {
 			if(((depth[v] - depth[u]) >> k) & 1) v = parent[k][v];
