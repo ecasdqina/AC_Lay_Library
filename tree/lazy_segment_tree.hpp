@@ -67,8 +67,8 @@ class lazy_segment_tree {
 		thrust(a += base_size());
 		thrust(b += base_size() - 1);
 		for(size_type l = a, r = b + 1; l < r; l >>= 1, r >>= 1) {
-			if(l & 1) lazy[l] = h(lazy[l++], x);
-			if(r & 1) lazy[--r] = h(lazy[r], x);
+			if(l & 1) lazy[l] = h(lazy[l], x), l++;
+			if(r & 1) --r, lazy[r] = h(lazy[r], x);
 		}
 		recalc(a);
 		recalc(b);
