@@ -19,7 +19,7 @@ class lowest_common_ancestor {
 		}
 	}
 	void build() {
-		dfs(0);
+		for(int i = 0; i < g.size(); i++) if(depth[i] != -1) dfs(i);
 		
 		for(int k = 0; k < logN - 1; k++) {
 			for(int i = 0; i < g.size(); i++) {
@@ -31,7 +31,7 @@ class lowest_common_ancestor {
 
 	public:
 	lowest_common_ancestor() {}
-	lowest_common_ancestor(int n) : g(n), depth(n) {
+	lowest_common_ancestor(int n) : g(n), depth(n, -1) {
 		parent.assign(logN, std::vector<size_t>(n, -1));
 	}
 	void add_edge(const size_t & u, const size_t & v) {
