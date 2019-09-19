@@ -1,4 +1,4 @@
-#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/all/DSL_2_E"
+#define PROBLEM "https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/all/DSL_2_G"
 
 #include <stdio.h>
 #include "../tree/lazy_segment_tree.hpp"
@@ -21,9 +21,9 @@ int main() {
 
 			seg.update(s - 1, t, x);
 		} else if(type == 1) {
-			int i; scanf("%d", &i);
+			int s, t; scanf("%d%d", &s, &t);
 			
-			printf("%d\n", seg[i - 1]);
+			printf("%lld\n", seg.fold(s - 1, t));
 		}
 	}
 
