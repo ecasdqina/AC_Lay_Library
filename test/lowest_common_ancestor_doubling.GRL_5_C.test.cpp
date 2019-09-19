@@ -15,6 +15,7 @@ int main() {
 			lca.add_edge(i, p);
 		}
 	}
+	
 
 	int q; scanf("%d", &q);
 	while(q--) {

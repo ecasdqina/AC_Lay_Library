@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <vector>
+#include <stdio.h>
 
 class lowest_common_ancestor {
 	std::vector<std::vector<size_t>> g, parent;
@@ -19,7 +20,7 @@ class lowest_common_ancestor {
 		}
 	}
 	void build() {
-		for(int i = 0; i < g.size(); i++) if(depth[i] != -1) dfs(i);
+		for(int i = 0; i < g.size(); i++) if(depth[i] == -1) dfs(i);
 		
 		for(int k = 0; k < logN - 1; k++) {
 			for(int i = 0; i < g.size(); i++) {
