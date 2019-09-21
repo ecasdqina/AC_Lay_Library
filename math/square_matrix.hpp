@@ -6,32 +6,30 @@
 // 冪：Θ(N^3logN)
 // square_matrix::E：単位行列
 // square_matrix::O：零行列
-template<class T>
+template<std::int_fast32_t n, class T>
 class square_matrix {
 	using value_type = T;
 	using i64 = std::int_fast64_t;
+	using u64 = std::uint_fast64_t;
 	
 	std::vector<std::vector<value_type>> data;
 
 	public:
-	square_matrix() {}
-	square_matrix(const size_t & n) : data(n, std::vector<value_type>(n, T())) {}
+	square_matrix() : data(n, std::vector<value_type>(n)){}
 	
-	static const square_matrix E(const size_t & n) {
-		square_matrix e(n);
-		for(size_t i = 0; i < n; i++) e[i][i] = 1;
+	static const square_matrix E() {
+		square_matrix e;
+		for(int i = 0; i < n; i++) e[i][i] = 1;
 		return e;
 	}
-	static const square_matrix O(const size_t & n) {
-		return square_matrix(n);
+	static const square_matrix O() {
+		return square_matrix();
 	}
-	
-	const size_t height() const {
-		return data.size();
+
+	const square_matrix pow(const u64 & k) {
+		return (*this) ^ k;
 	}
-	const size_t width() const {
-		return data.size();
-	}
+
 	const T determinant() const {
 		square_matrix B(*this);
 		T ret = 1;
@@ -55,6 +53,8 @@ class square_matrix {
 		}
 		return ret;
 	}
+	const size_t height() const { return n; }
+	const size_t width() const { return n; }
 	
 	const std::vector<value_type> & operator[](const size_t & k) const {
 		return data.at(k);
@@ -63,30 +63,27 @@ class square_matrix {
 		return data.at(k);
 	}
 	square_matrix & operator+=(const square_matrix & B) {
-		assert(height() == B.height());
 		for(int i = 0; i < height(); i++)
 			for(int j = 0; j < width(); j++)
 				(*this)[i][j] += B[i][j];
 		return (*this);
 	}
 	square_matrix & operator-=(const square_matrix & B) {
-		assert(height() == B.height());
 		for(int i = 0; i < height(); i++)
 			for(int j = 0; j < width(); j++)
 				(*this)[i][j] -= B[i][j];
 		return (*this);
 	}
 	square_matrix & operator*=(const square_matrix & B) {
-		assert(height() == B.height());
-		auto C = square_matrix::O(height());
+		auto C = square_matrix::O();
 		for(int i = 0; i < height(); i++)
 			for(int j = 0; j < width(); j++)
 				for(int k = 0; k < height(); k++)
 					C[i][j] = (C[i][j] + (*this)[i][k] * B[k][j]);
 		return (*this) = C;
 	}
-	square_matrix & operator^=(i64 k) {
-		auto B = square_matrix::E(height());
+	square_matrix & operator^=(u64 k) {
+		auto B = square_matrix::E();
 		while(k) {
 			if(k & 1) B *= (*this);
 			(*this) *= (*this);
@@ -107,7 +104,7 @@ class square_matrix {
 	const square_matrix operator*(const square_matrix & B) const {
 		return (square_matrix(*this) *= B);
 	}
-	const square_matrix operator^(const i64 & k) const {
+	const square_matrix operator^(const u64 & k) const {
 		return (square_matrix(*this) ^= k);
 	}
 	const bool operator==(const square_matrix & B) const {
@@ -125,4 +122,5 @@ class square_matrix {
 };
 
 // verify
-// +(積・冪） https://yukicoder.me/submissions/382079
+// + pow https://yukicoder.me/submissions/382079
+// - TLE http://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=3884450#1
