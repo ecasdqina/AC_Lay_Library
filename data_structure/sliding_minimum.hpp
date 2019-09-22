@@ -20,7 +20,7 @@ protected:
 	std::vector<value_type> data, val;
 	std::deque<u32> deq;
 	
-	const u32 L;
+	u32 L;
 
 	Compare comp;
 	
@@ -46,7 +46,19 @@ public:
 		return false;
 	}
 	
+	const u32 width() const { return L; }
 	const size_t size() const { return val.size(); }
 	const size_t data_size() const { return data.size(); }
 	const value_type operator[](const u32 & k) const { return val[k]; }
+	const value_type front() { return val.front(); }
+	const value_type back() { return val.back(); }
+	const std::vector<value_type> get_data() { return data; }
+	void swap(sliding_minimum & r) {
+		using std::swap;
+		data.swap(r.data);
+		val.swap(r.val);
+		deq.swap(r.deq);
+		swap(L, r.L);
+		swap(comp, r.comp);
+	}
 };
