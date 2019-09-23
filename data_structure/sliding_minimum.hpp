@@ -10,49 +10,61 @@
 // amorized time: O(N)
 template<
 	class T,
-	class Compare = std::less<T>
+	class Container = std::vector<T>,
+	class Compare = std::less<typename Container::value_type>
 > class sliding_minimum {
 public:
-	using value_type = T;
-	using u32 = std::uint_fast32_t;
-
+	using value_type = typename Container::value_type;
+	using reference = typename Container::reference;
+	using const_reference = typename Container::const_reference;
+	using size_type = typename Container::size_type;
+	using container = Container;
+	using compare = Compare;
+	using deque = std::deque<size_type>;
+	
 protected:
-	std::vector<value_type> data, val;
-	std::deque<u32> deq;
-	
-	u32 L;
+	container data, val;
+	deque deq;
 
-	Compare comp;
-	
+	size_type L;
+	compare comp;
+
 public:
-	sliding_minimum(const Compare & comp = Compare()) : L(1), comp(comp) {}
-	sliding_minimum(const u32 & L, const Compare & comp = Compare()) : L(L), comp(comp) {}
-	sliding_minimum(const u32 & L, const std::vector<value_type> & vec, const Compare & comp = Compare()) : L(L), comp(comp) {
+	sliding_minimum(const sliding_minimum &) = default;
+	sliding_minimum(sliding_minimum &&) = default;
+	
+	sliding_minimum() : L(1) {}
+	sliding_minimum(const size_type & L) : L(L) {}
+	sliding_minimum(const size_type & L, const container & vec) : L(L) {
 		for(auto x: vec) push(x);
 	}
+	template<class InputIterator>
+	sliding_minimum(const size_type & L, InputIterator first, InputIterator last, const compare & x = compare(), container && c = container()) : L(L), comp(comp), data(c), val(c) {
+		while(first != last) push(*first++);
+	}
+
+	sliding_minimum & operator=(sliding_minimum const &) = default;
+	sliding_minimum & operator=(sliding_minimum &&) = default;
 	
-	bool push(value_type x) {
-		const u32 i = data.size();
+	void push(const_reference x) {
+		const size_type i = data.size();
 		data.push_back(x);
 
 		while(!deq.empty() and i >= L + deq.front()) deq.pop_front();
 		while(!deq.empty() and comp(x, data[deq.back()])) deq.pop_back();
 		deq.push_back(i);
 
-		if(i + 1 >= L) {
-			val.push_back(data[deq.front()]);
-			return true;
-		}
-		return false;
+		if(i + 1 >= L) val.push_back(data[deq.front()]);
 	}
 	
-	const u32 width() const { return L; }
-	const size_t size() const { return val.size(); }
-	const size_t data_size() const { return data.size(); }
-	const value_type operator[](const u32 & k) const { return val[k]; }
+	const size_type width() const { return L; }
+	const size_type size() const { return val.size(); }
+	const size_type data_size() const { return data.size(); }
+	const value_type operator[](const size_type & k) const { return val[k]; }
 	const value_type front() { return val.front(); }
 	const value_type back() { return val.back(); }
-	const std::vector<value_type> get_data() { return data; }
+	const container get_data() { return data; }
+	const container get_val() { return val; }
 	void swap(sliding_minimum & r) {
 		using std::swap;
 		data.swap(r.data);
