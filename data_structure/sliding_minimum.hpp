@@ -33,13 +33,13 @@ public:
 	sliding_minimum(const sliding_minimum &) = default;
 	sliding_minimum(sliding_minimum &&) = default;
 	
-	sliding_minimum() : L(1) {}
-	sliding_minimum(const size_type & L) : L(L) {}
-	sliding_minimum(const size_type & L, const container & vec) : L(L) {
+	sliding_minimum(const compare & comp = compare()) : L(1), comp(comp) {}
+	sliding_minimum(const size_type & L, const compare & comp = compare()) : L(L), comp(comp) {}
+	sliding_minimum(const size_type & L, const container & vec, const compare & comp = compare()) : L(L), comp(comp) {
 		for(auto x: vec) push(x);
 	}
 	template<class InputIterator>
-	sliding_minimum(const size_type & L, InputIterator first, InputIterator last, const compare & x = compare(), container && c = container()) : L(L), comp(comp), data(c), val(c) {
+	sliding_minimum(const size_type & L, InputIterator first, InputIterator last, const compare & x = compare()) : L(L), comp(comp) {
 		while(first != last) push(*first++);
 	}
 
@@ -61,10 +61,10 @@ public:
 	const size_type size() const { return val.size(); }
 	const size_type data_size() const { return data.size(); }
 	const value_type operator[](const size_type & k) const { return val[k]; }
-	const value_type front() { return val.front(); }
-	const value_type back() { return val.back(); }
-	const container get_data() { return data; }
-	const container get_val() { return val; }
+	const value_type front() const { return val.front(); }
+	const value_type back() const { return val.back(); }
+	const container get_data() const { return data; }
+	const container get_val() const { return val; }
 	void swap(sliding_minimum & r) {
 		using std::swap;
 		data.swap(r.data);
