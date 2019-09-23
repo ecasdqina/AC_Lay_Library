@@ -1,5 +1,6 @@
 #define PROBLEM "http://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_A"
 
+#include <stdio.h>
 #include "../tree/union_find_tree.hpp"
 
 int main() {
@@ -10,6 +11,6 @@ int main() {
 		int type, x, y; scanf("%d%d%d", &type, &x, &y);
 
 		if(type == 0) uf.unite(x, y);
-		else printf("%d\n", uf.same(x, y));
+		else printf("%d\n", uf.is_same(x, y));
 	}
 }

@@ -43,7 +43,7 @@ public:
 		while(first != last) push(*first++);
 	}
 
-	sliding_minimum & operator=(sliding_minimum const &) = default;
+	sliding_minimum & operator=(const sliding_minimum &) = default;
 	sliding_minimum & operator=(sliding_minimum &&) = default;
 	
 	void push(const_reference x) {
@@ -60,9 +60,9 @@ public:
 	const size_type width() const { return L; }
 	const size_type size() const { return val.size(); }
 	const size_type data_size() const { return data.size(); }
-	const value_type operator[](const size_type & k) const { return val[k]; }
 	const value_type front() const { return val.front(); }
 	const value_type back() const { return val.back(); }
+	const value_type operator[](const size_type & k) const { return val[k]; }
 	const container get_data() const { return data; }
 	const container get_val() const { return val; }
 	void swap(sliding_minimum & r) {
