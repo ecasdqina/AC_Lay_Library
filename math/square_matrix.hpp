@@ -67,6 +67,7 @@ public:
 		return ret;
 	}
 	
+	constexpr const size_type size() const { return N; }
 	constexpr const size_type height() const { return N; }
 	constexpr const size_type width() const { return N; }
 	const std::vector<value_type> & operator[](const size_type & k) const { return data.at(k); }
