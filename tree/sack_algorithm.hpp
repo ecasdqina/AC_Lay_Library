@@ -67,14 +67,14 @@ public:
 			for(auto e: g[v]) if(e != par and e != heavy) solve(solve, e, v, false);
 			if(heavy != -1) solve(solve, heavy, v, true);
 			
-			add(v, v);
+			add(v);
 			for(auto e: g[v]) {
 				if(e == par or e == heavy) continue;
 
 				for(size_type i = L[e]; i < R[e]; i++) {
 					const size_type u = tour[i];
 					
-					add(v, u);
+					add(u);
 				}
 			}
 			proceed(v);
@@ -83,7 +83,7 @@ public:
 				for(size_type i = L[v]; i < R[v]; i++) {
 					const size_type u = tour[i];
 					
-					rem(v, u);
+					rem(u);
 				}
 			}
 		};
