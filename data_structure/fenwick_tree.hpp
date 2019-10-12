@@ -111,6 +111,12 @@ public:
 	bool empty() const { return size() == 0; }
 	size_type size() const { return data.size() - 1; }
 	value_type operator[](const size_type & k) { return fold(k, k + 1); };
+	void swap(fenwick_tree r) {
+		using std::swap;
+		
+		data.swap(r.data);
+		swap(base_size, r.base_size);
+	}
 };
 
 /*
