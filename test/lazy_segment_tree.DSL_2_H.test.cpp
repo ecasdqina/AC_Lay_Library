@@ -1,7 +1,7 @@
 #define PROBLEM "https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/all/DSL_2_H"
 
 #include <stdio.h>
-#include "../tree/lazy_segment_tree.hpp"
+#include "../data_structure/lazy_segment_tree.hpp"
 
 int main() {
 	int n, q; scanf("%d%d", &n, &q);

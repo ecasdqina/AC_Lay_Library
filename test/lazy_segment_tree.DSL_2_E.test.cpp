@@ -1,7 +1,7 @@
 #define PROBLEM "https://onlinejudge.u-aizu.ac.jp/courses/library/3/DSL/all/DSL_2_E"
 
 #include <stdio.h>
-#include "../tree/lazy_segment_tree.hpp"
+#include "../data_structure/lazy_segment_tree.hpp"
 
 using i64 = long long;
 
