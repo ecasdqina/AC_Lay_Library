@@ -1,4 +1,5 @@
 #include <vector>
+#include <assert.h>
 
 template<
 	class CommutativeMonoid,
