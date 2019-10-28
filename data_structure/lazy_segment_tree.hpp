@@ -37,7 +37,7 @@ class lazy_segment_tree {
 		int r = l + (base_size() >> depth[k]);
 		return g(data[k], lazy[k], l, r);
 	}
-	void eval(const size_type & k) {
+	void propagate(const size_type & k) {
 		if(lazy[k] == id_op) return;
 		lazy[k << 1 ^ 0] = h(lazy[k << 1 ^ 0], lazy[k]);
 		lazy[k << 1 ^ 1] = h(lazy[k << 1 ^ 1], lazy[k]);
@@ -45,13 +45,13 @@ class lazy_segment_tree {
 		lazy[k] = id_op;
 	}
 	void thrust(const size_type & k) {
-		for(int i = height_; i; i--) eval(k >> i);
+		for(int i = height_; i; i--) propagate(k >> i);
 	}
 	void recalc(size_type k) {
 		while(k >>= 1) data[k] = f(reflect(k << 1 ^ 0), reflect(k << 1 ^ 1));
 	}
 	
-	public:
+public:
 	lazy_segment_tree() {}
 	lazy_segment_tree(int n, const F & f, const G & g, const H & h, const value_type & id, const operator_type & id_op) :
 		size_(n), f(f), g(g), h(h), id(id), id_op(id_op) {
