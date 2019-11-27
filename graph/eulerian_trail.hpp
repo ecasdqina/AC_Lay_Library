@@ -5,16 +5,17 @@
 #include <stack>
 
 template<
-	class Edge = std::pair<std::uint_fast32_t, std::uint_fast32_t>
+	class Edge
 > class eulerian_trail {
 public:
-	using edge = Edge;
 	using value_type = std::uint_fast32_t;
 	using size_type = std::uint_fast32_t;
+	using edge = Edge;
+	using edge_container = std::vector<edge>;
 	
 	using u32 = std::uint_fast32_t;
 	
-	std::vector<Edge> edges;
+	edge_container edges;
 	bool directed;
 	size_type n;
 
@@ -23,15 +24,15 @@ private:
 		std::vector<u32> ret, deg(n, 0);
 		if(is_directed()) {
 			for(auto v: edges) {
-				deg[v.first]++;
-				deg[v.second]--;
+				deg[v.from]++;
+				deg[v.to]--;
 			}
 
 			for(int i = 0; i < n; i++) if(deg[i] == 1) ret.push_back(i);
 		} else {
 			for(auto v: edges) {
-				deg[v.first]++;
-				deg[v.second]++;
+				deg[v.from]++;
+				deg[v.to]++;
 			}
 
 			for(int i = 0; i < n; i++) if(deg[i] & 1) ret.push_back(i);
@@ -41,8 +42,8 @@ private:
 	std::vector<u32> transform_to_vertices_from_edges(std::vector<edge> && ed) const {
 		if(ed.empty()) return {};
 		
-		std::vector<u32> ret(1, ed.front().first);
-		for(int i = 0; i < ed.size(); i++) ret.emplace_back(ed[i].second);
+		std::vector<u32> ret(1, ed.front().from);
+		for(int i = 0; i < ed.size(); i++) ret.emplace_back(ed[i].to);
 		return ret;
 	}
 
@@ -51,11 +52,11 @@ public:
 	eulerian_trail(eulerian_trail &&) = default;
 	
 	eulerian_trail(bool directed = false)
-		: n(0), edges(0), directed(directed) {};
+		: n(0), edges(), directed(directed) {};
 	eulerian_trail(const std::vector<edge> & edges, bool directed = false)
 		: edges(edges), directed(directed) {
 		n = 0;
-		for(auto e: edges) n = std::max<u32>({n, e.first + 1, e.second + 1});
+		for(auto e: edges) n = std::max<u32>({n, e.from + 1, e.to + 1});
 	}
 
 	eulerian_trail & operator=(const eulerian_trail &) = default;
@@ -68,24 +69,24 @@ public:
 		n = std::max<u32>({n, u + 1, v + 1});
 	}
 
-	std::vector<edge> get_eulerian_trail_with_edge() const {
+	edge_container get_eulerian_trail_with_edge() const {
 		auto odds = get_odd_degree_vertices();
 		
 		return get_eulerian_trail_with_edge((odds.empty() ? 0 : odds.front()));
 	}
-	std::vector<edge> get_eulerian_trail_with_edge(u32 src) const {
+	edge_container get_eulerian_trail_with_edge(u32 src) const {
 		if(!eulerian_trail_exists()) return {};
 		
 		std::vector<std::vector<std::pair<edge, u32>>> g(n);
 		for(auto e: edges) {
-			u32 from = e.first, to = e.second;
+			u32 from = e.from, to = e.to;
 
-			g[from].emplace_back(edge{from, to}, (u32)g[to].size());
-			if(is_undirected()) g[to].emplace_back(edge{to, from}, (u32)g[from].size() - 1);
+			g[from].emplace_back(edge(from, to), (u32)g[to].size());
+			if(is_undirected()) g[to].emplace_back(edge(to, from), (u32)g[from].size() - 1);
 		}
 
 		std::vector<edge> ord;
-		std::stack<std::pair<int, edge>> st({{src, {-1, -1}}});
+		std::stack<std::pair<int, edge>> st({{src, edge{-1, -1}}});
 		while(!st.empty()) {
 			int idx = st.top().first;
 
@@ -97,8 +98,8 @@ public:
 				g[idx].pop_back();
 				if(e.second == -1) continue;
 				
-				if(is_undirected()) g[e.first.second][e.second].second = -1;
-				st.emplace(e.first.second, e.first);
+				if(is_undirected()) g[e.first.to][e.second].second = -1;
+				st.emplace(e.first.to, e.first);
 			}
 		}
 		ord.pop_back();
@@ -121,9 +122,9 @@ public:
 	const bool is_connected() const {
 		std::vector<std::vector<u32>> g(n);
 		for(auto e: edges) {
-			g[e.first].push_back(e.second);
+			g[e.from].push_back(e.to);
 
-			if(is_undirected()) g[e.second].push_back(e.first);
+			if(is_undirected()) g[e.to].push_back(e.from);
 		}
 
 		std::queue<u32> qu({0});
@@ -145,8 +146,8 @@ public:
 		if(!is_connected()) return false;
 		if(is_directed()) {
 			for(auto v: edges) {
-				deg[v.first]++;
-				deg[v.second]--;
+				deg[v.from]++;
+				deg[v.to]--;
 			}
 
 			u32 s = 0, t = 0;
@@ -157,8 +158,8 @@ public:
 			return ((s == 0 and t == 0) or (s == 1 and t == 1));
 		} else {
 			for(auto v: edges) {
-				deg[v.first]++;
-				deg[v.second]++;
+				deg[v.from]++;
+				deg[v.to]++;
 			}
 
 			u32 s = 0;
