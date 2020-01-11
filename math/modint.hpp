@@ -16,14 +16,7 @@ class modint {
 	constexpr const u64 &value() const noexcept { return a; }
 
 	const modint inverse() const {
-		i64 x = a, b = Modulus, u = 1, v = 0;
-		while(b > 0) {
-			auto t = x / b;
-
-			std::swap(x -= t * b, b);
-			std::swap(u -= t * v, v);
-		}
-		return modint(u);
+		return modint(1) / *this;
 	}
 	const modint pow(i64 k) const {
 		return modint(*this) ^ k;
