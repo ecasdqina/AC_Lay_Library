@@ -19,7 +19,7 @@ class segment_tree {
 	private:
 	const size_type get_height(const size_type& size) const {
 		size_type height = 1;
-		while(1 << height < size) height++;
+		while(1 << height <= size) height++;
 		return height;
 	}
 	const size_type base_size() const {
@@ -63,27 +63,24 @@ class segment_tree {
 	}
 	const size_type search(const size_type & left, const checker & check) {
 		value_type val = id;
-		size_t base_size_ = base_size();
-		auto find = [&](auto&& find, size_type k, size_type l, size_type r) -> int {
-			if(l + 1 == r) {
+		size_type k = left + base_size();
+		while(true) {
+			if(check(bi_func(val, data[k]))) {
 				val = bi_func(val, data[k]);
-				
-				return (check(val) ? k - base_size_ : -1);
+				if(k & 1) {
+					if((k + 1) & k) k = (k + 1) >> 1;
+					else return size();
+				} else {
+					k = k + 1;
+				}
+			} else {
+				if(k < base_size()) {
+					k = k << 1 ^ 0;
+				} else {
+					return k - base_size();
+				}
 			}
-
-			const size_type mid = (l + r) >> 1;
-			if(mid <= left) return find(find, k << 1 ^ 1, mid, r);
-			if(left <= l and !check(bi_func(val, data[k]))) {
-				val = bi_func(val, data[k]);
-				return -1;
-			}
-
-			const int left_ret = find(find, k << 1 ^ 0, l, mid);
-			if(left_ret == -1) return find(find, k << 1 ^ 1, mid, r);
-			return left_ret;
-		};
-
-		return find(find, 1, 0, base_size_); 
+		}
 	}
 	
 	value_type operator[](const size_type& index) const {
