@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ecasdqina/AC_Lay_Library.svg?branch=master)](https://travis-ci.org/ecasdqina/AC_Lay_Library)
+[![Actions Status](https://github.com/ecasdqina/AC_Lay_Library/workflows/verify/badge.svg)](https://github.com/ecasdqina/AC_Lay_Library/actions)
 
 競技プログラミング用ライブラリ
 
